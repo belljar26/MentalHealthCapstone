@@ -1,0 +1,127 @@
+---
+title: "Cleaning Data-Capstone"
+author: "E.Matthews"
+date: "5 March 2017"
+output: html_document
+---
+
+```{r survey, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown- Cleaning Capstone Data
+
+This document details the processes and code used to clean the Mental Health Survey (2014) [Data Set](www.kaggle.com/osmi/mental-health-in-tech-survey). This data set contains 1259 observations and 27 variables. This data set was obtained from the Open Source Mental Illness Project (on the Kaggle website)
+
+Before beginning any analyses, the raw data set was reviewed to determine what cleaning/manipulating was needed. Several issues were noted including:
+
+* *Gender variable*-- multiple misspellings, multiple forms to represent one gender (e.g. M, or m, Male for Male) as well as a number of other gender representations (Cis, femme-male, trans)
+
+* *Wellness, Anonymity, Coworkers, Care Options, Supervisor, Coworker, Seek _Help variables* required some cleaning as the levels within the variable frequently had spaces (e.g. "Don't know")
+
+* *State variable*-- many missing values due to responses from foreign respondents
+
+* *Number of Employees and Age variables*-- numeric errors present (e.g. 999 for an age)
+
+The following is the code for cleaning each variable :
+
+
+#### Gender Variable
+
+```{r warning = FALSE, error = FALSE, eval=FALSE}
+
+read_csv("survey.csv"")
+b<- as.factor(survey$Gender)
+levels(b)
+# 45 levels of Gender-- will have them match to Male, Female, Other
+survey$Gender[survey$Gender=="M"] <- "Male "
+survey$Gender[survey$Gender=="m"]<-" Male "
+survey$Gender[survey$Gender== "Agender"]<- "Other"
+survey$Gender[survey$Gender=="All"] <- "Other"
+survey$Gender[survey$Gender == "Androgyne"] <- "Other"
+survey$Gender[survey$Gender == "Cis Female"] <- 'Other'
+survey$Gender[survey$Gender== "cis male"] <-"Other"
+survey$Gender[survey$Gender== "Cis Male"] <- "Other"
+survey$Gender[survey$Gender== "Cis Man"] <- "Other"
+survey$Gender[survey$Gender == "Enby"] <- "Other"
+survey$Gender[survey$Gender == "f"] <-"Female"
+survey$Gender[survey$Gender == "F"] <- "Female"
+survey$Gender[survey$Gender== "femail"] <- "Other"
+survey$Gender[survey$Gender== "Femake"] <- "Other"
+survey$Gender[survey$Gender== "female"] <-"Female"
+survey$Gender[survey$Gender == "Female (cis)"] <- "Other"
+survey$Gender[survey$Gender== "Female (trans)"] <-"Other"
+survey$Gender[survey$Gender== "fluid"] <- "Other"
+survey$Gender[survey$Gender== "Genderqueer"] <- "Other"
+survey$Gender[survey$Gender== "Guy (-ish) ^_^"] <- "Other"
+survey$Gender[survey$Gender== "Mail"] <- "Other"
+survey$Gender[survey$Gender == "maile"] <- "Other"
+survey$Gender[survey$Gender == "Make"] <- "Male"
+survey$Gender[survey$Gender == "male"] <- "Male"
+survey$Gender[survey$Gender == "Male (CIS)"] <- "Other"
+survey$Gender[survey$Gender == "male learning androgynous"]<- "Other"
+survey$Gender[survey$Gender == "Male-ish"] <- "Other"
+survey$Gender[survey$Gender =="Malr"] <- "Other"
+survey$Gender[survey$Gender == "Man"] <- "Male"
+survey$Gender[survey$Gender== "msle"] <- "Male"
+survey$Gender[survey$Gender== "Nah"] <- "Other"
+survey$Gender[survey$Gender== "Neuter"] <- "Other"
+survey$Gender[survey$Gender == "non-binary"] <- "Other"
+survey$Gender[survey$Gender== "ostensibly male, unsure what that
+              really means" ] <- "Other"
+survey$Gender[survey$Gender == "p"] <- "Other"
+survey$Gender[survey$Gender == "queer"] <- "Other"
+survey$Gender[survey$Gender =="queer/she/they"] <- "Other"
+survey$Gender[survey$Gender == "something kinda male?"] <- "Other"
+survey$Gender[survey$Gender == "Trans woman"] <- "Other"
+survey$Gender [survey$Gender == "Trans-female"] <- "Other"
+survey$Gender[survey$Gender == "woman"] <- "Female"
+survey$Gender[survey$Gender == "Woman"] <- "Female"
+survey$Gender[survey$Gender == "A little about you"] <- "Other"
+survey$Gender[survey$Gender == "cis-female/femme"] <- "Other"
+# save clean file
+write.csv(survey, "survey_clean.csv")
+
+```
+
+#### Care_Options Variable
+
+```{r warning=FALSE, error=FALSE, eval=FALSE}
+read.csv("survey_clean.csv")
+summary(survey_clean)
+#Clean care options variable--there is a space between Not sure--change to unsure
+survey_clean$care_options[survey_clean$care_options== "Not sure"]<- "Unsure"
+survey_clean[is.na(survey_clean$care_options),]
+```
+#### Benefits Variable
+```{r warning=FALSE, error=FALSE, eval=FALSE}
+#Clean benefits--space between don't know
+survey_clean$benefits[survey_clean$benefits == "Don't know"]<- "DK"
+
+```
+#### Wellness_Program , Anonymity, Coworkers, Supervisor, Mental vs Physical, Seek_Help Variables
+```{r warning=FALSE, error=FALSE, eval=FALSE}
+#Clean wellness program variable-- space between don'tknow
+survey_clean$wellness_program[survey_clean$wellness_program == "Don't know"]<- "DK"
+#Clean anonymity variable-- space between "don't know"
+survey_clean$anonymity[survey_clean$anonymity == "Don't know"] <- "DK"
+# Clean coworkers and supervisors columns-- some of them --spaces
+survey_clean$coworkers[survey_clean$coworkers == "Some of them"] <- "Some"
+survey_clean$supervisor[survey_clean$supervisor == "Some of them"] <- "Some"
+#Clean mentalvs phys column--space between Don't know
+survey_clean$mental_vs_physical[survey_clean$mental_vs_physical == "Don't know"]<-"DK"
+#Clean seek help column-space in Don't know
+survey_clean$seek_help[survey_clean$seek_help == "Don't know"]<- "DK"
+```
+#### Leave Variable
+```{r warning=FALSE, error=FALSE, eval=FALSE}
+#Clean leave column--many spaces 
+survey_clean$leave[survey_clean$leave == "Don't know"]<- "DK"
+survey_clean$leave[survey_clean$leave == "Very easy"] <- "Veryeasy"
+survey_clean$leave[survey_clean$leave == "Somewhat difficult"]<- "Somediff"
+survey_clean$leave[survey_clean$leave == "Somewhat easy"] <- "Someasy"
+survey_clean$leave[survey_clean$leave == "Very difficult"]<-"Verydiff"
+#save cleaned file
+write_csv(survey_clean, "survey_clean1.csv")
+```
+
