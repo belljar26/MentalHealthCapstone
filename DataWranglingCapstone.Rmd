@@ -5,9 +5,6 @@ date: "5 March 2017"
 output: html_document
 ---
 
-```{r survey, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
 ## R Markdown- Cleaning Capstone Data
 
@@ -30,7 +27,7 @@ The following is the code for cleaning each variable :
 
 ```{r warning = FALSE, error = FALSE, eval=FALSE}
 
-read_csv("survey.csv"")
+read_csv("survey.csv")
 b<- as.factor(survey$Gender)
 levels(b)
 # 45 levels of Gender-- will have them match to Male, Female, Other
