@@ -1,10 +1,13 @@
 ---
 title: "Cleaning Data-Capstone"
 author: "E.Matthews"
-date: "5 March 2017"
+date: "14 March 2017"
 output: html_document
 ---
 
+```{r survey, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
 ## R Markdown- Cleaning Capstone Data
 
@@ -43,7 +46,7 @@ survey$Gender[survey$Gender== "Cis Man"] <- "Other"
 survey$Gender[survey$Gender == "Enby"] <- "Other"
 survey$Gender[survey$Gender == "f"] <-"Female"
 survey$Gender[survey$Gender == "F"] <- "Female"
-survey$Gender[survey$Gender== "femail"] <- "Other"
+survey$Gender[survey$Gender== "femail"] <- "Female"
 survey$Gender[survey$Gender== "Femake"] <- "Female"
 survey$Gender[survey$Gender== "female"] <-"Female"
 survey$Gender[survey$Gender == "Female (cis)"] <- "Other"
@@ -51,14 +54,14 @@ survey$Gender[survey$Gender== "Female (trans)"] <-"Other"
 survey$Gender[survey$Gender== "fluid"] <- "Other"
 survey$Gender[survey$Gender== "Genderqueer"] <- "Other"
 survey$Gender[survey$Gender== "Guy (-ish) ^_^"] <- "Other"
-survey$Gender[survey$Gender== "Mail"] <- "Other"
-survey$Gender[survey$Gender == "maile"] <- "Other"
+survey$Gender[survey$Gender== "Mail"] <- "Male"
+survey$Gender[survey$Gender == "maile"] <- "Male"
 survey$Gender[survey$Gender == "Make"] <- "Male"
 survey$Gender[survey$Gender == "male"] <- "Male"
 survey$Gender[survey$Gender == "Male (CIS)"] <- "Other"
 survey$Gender[survey$Gender == "male learning androgynous"]<- "Other"
 survey$Gender[survey$Gender == "Male-ish"] <- "Other"
-survey$Gender[survey$Gender =="Malr"] <- "Male"
+survey$Gender[survey$Gender =="Malr"] <- "Other"
 survey$Gender[survey$Gender == "Man"] <- "Male"
 survey$Gender[survey$Gender== "msle"] <- "Male"
 survey$Gender[survey$Gender== "Nah"] <- "Other"
@@ -122,3 +125,104 @@ survey_clean$leave[survey_clean$leave == "Very difficult"]<-"Verydiff"
 write_csv(survey_clean, "survey_clean1.csv")
 ```
 
+#### Age Variable-- multiple errors in Age column (age outliers such as 5 or 99999) . These were converted to NA, and then replaced with the mean age
+
+```{r warning=FALSE, error= FALSE, eval =FALSE}
+survey_clean2 <-read.csv("survey_clean1.csv")
+View(survey_clean2)
+# Fix age variable
+a<-as.factor(survey_clean2$Age)
+levels(a)
+survey_clean2$Age[(survey_clean2$Age == -1726) |
+                    (survey_clean2$Age == -1) |
+                    (survey_clean2$Age == 5) |
+                    (survey_clean2$Age == 329) |
+                    (survey_clean2$Age == 99999999999)] <-NA
+survey_clean2$Age[(survey_clean2$Age == -29)] <- 29
+View(survey_clean2)
+mean(survey_clean2$Age)
+# mean age is 32- replace NA with mean age 
+survey_clean2$Age[is.na(survey_clean2$Age)] <- mean(survey_clean2$Age, na.rm= TRUE)
+
+```
+
+
+#### Clean Number of Employees Column 
+```{r warning = FALSE, error= FALSE, eval= FALSE}
+# Fix Number of Employees Column
+levels(survey_clean2$no_employees)
+survey_clean2$no_employees <- as.character(survey_clean2$no_employees)
+survey_clean2$no_employees[(survey_clean2$no_employees == "Jun-25")]<-"6-25"
+survey_clean2$no_employees[(survey_clean2$no_employees == "01-May")]<- "1-5"
+write.csv(survey_clean2, "survey_clean2.csv")
+```
+#### Change NA to Foreign in State Column
+
+```{r warning=FALSE, error= FALSE, eval= FALSE}
+class(survey_clean4$state)
+levels(survey_clean4$state)
+class(survey_clean4$Country)
+levels(survey_clean4$Country)
+# change state NA to foreign
+survey_clean4$state <-as.character(survey_clean4$state)
+class(survey_clean4$state)
+survey_clean4$state[is.na(survey_clean4$state)]<-"Foreign"
+
+write_csv(survey_clean4, "survey_clean4.csv")
+```
+
+#### Add new column for Region based on State info
+
+```{r warning=FALSE, error= FALSE, eval= FALSE}
+survey_clean4 <- read.csv("survey_clean4.csv")
+# add new column - region (for states)
+survey_clean4$region <- ifelse(survey_clean4$state == "NY", "NE",
+ifelse(survey_clean4$state == "PA","NE",
+ifelse(survey_clean4$state == "RI","NE",                            ifelse(survey_clean4$state == "CT", "NE",
+                                                    ifelse(survey_clean4$state == "NJ", "NE",
+                                                           ifelse(survey_clean4$state == "NH", "NE",
+                                                                  ifelse(survey_clean4$state == "MA", "NE",
+                                                                    ifelse(survey_clean4$state == "ME", "NE",
+                                                                    ifelse(survey_clean4$state == "VT", "NE",
+                                                                    ifelse(survey_clean4$state == "MN", "MW",
+                                                                    ifelse(survey_clean4$state == "MI", "MW",
+                                                                     ifelse(survey_clean4$state == "MO", "MW",
+                                                                      ifelse(survey_clean4$state == "KS", "MW",
+                                                                                                                   ifelse(survey_clean4$state =="NE", "MW",
+                                                                                                                          ifelse(survey_clean4$state == "IN", "MW",
+                                                                                                                                 ifelse(survey_clean4$state == "IL", "MW",
+                                                                                                                                        ifelse(survey_clean4$state == "SD", "MW",
+                                                                                                                                          ifelse(survey_clean4$state == "OH", "MW",
+                                                                                                                                          ifelse(survey_clean4$state == "IA","MW",
+                                                                                                                                          ifelse(survey_clean4$state == "WI", "MW",
+                                                                                                                                        ifelse(survey_clean4$state == "FL", "S",
+                                                                                                                                                                        
+                                                                                                                                        ifelse(survey_clean4$state == "AL", "S",
+                                                                                                                                        ifelse(survey_clean4$state == "GA", "S",
+                                                                                                                                                                                         ifelse(survey_clean4$state == "SC", "S",
+                                                                                                                                                                                                ifelse(survey_clean4$state == "TN", "S",
+                                                                                                                                                                                                       ifelse(survey_clean4$state == "TX", "S",
+                                                                                                                                                                                                              ifelse(survey_clean4$state == "OK", "S",
+                                                                                                                                                                                                              ifelse(survey_clean4$state == "LA", "S",
+                                                                                                                                                                                                              ifelse(survey_clean4$state == "DC", "S",
+                                                                                                                                                                                                                ifelse(survey_clean4$state == "KY", "S",
+                                                                                                                                                                                                                ifelse(survey_clean4$state == "MD", "S",
+                                                                                                                                                                                                                ifelse(survey_clean4$state == "NC", "S",
+                                                                                                                                                                                                               ifelse(survey_clean4$state == "WV", "S",
+                                                                                                                                                                                                                                                               ifelse(survey_clean4$state == "VA", "S",
+                                                                                                                                                                                                                                                                      ifelse(survey_clean4$state == "MS", "S",
+                                                                                                                                                                                                                                                                             ifelse(survey_clean4$state == "ID", "W",
+                                                                                                                                                                                                                                                                                    ifelse(survey_clean4$state == "AZ", "W",
+                                                                                                                                                                                                                                                                                    ifelse(survey_clean4$state == "NM", "W",
+                                                                                                                                                                                                                                                                                    ifelse(survey_clean4$state == "WY", "W",
+                                                                                                                                                                                                                                                                                    ifelse(survey_clean4$state == "CO", "W",
+                                                                                                                                                                                                                                                                                    ifelse(survey_clean4$state == "UT", "W",
+                                                                                                                                                                                                                                                                                    ifelse(survey_clean4$state == "NV", "W",
+                                                                                                                                                                                                                                                                                    ifelse(survey_clean4$state == "CA","W",
+                                                                                                                                                                                                                                                                                                                                     ifelse(survey_clean4$state =="OR", "W", "foreign"
+                                                                                                                                                                                                                                                                                                                                            ))))))))))))))))))))))))))))))))))))))))))))
+# reorder columns for clarity
+survey_clean5 <- survey_clean4[,c(1:7, 30, 8:29)]
+View(survey_clean5)
+write.csv(survey_clean5, "survey_clean5.csv")
+```
